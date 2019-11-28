@@ -32,7 +32,6 @@ export function buildURL(
   } else if (isURLSearchParams(params)) {
     serializedParams = params.toString()
   } else {
-
     const parts: string[] = []
 
     Object.keys(params).forEach(key => {
@@ -59,7 +58,7 @@ export function buildURL(
 
     serializedParams = parts.join('&')
   }
-  
+
   if (serializedParams) {
     const markIndex = url.indexOf('#')
     if (markIndex !== -1) {
