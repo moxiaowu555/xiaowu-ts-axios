@@ -46,6 +46,7 @@ export default class Axios {
 
     // 配置合并
     config = mergeConfig(this.defaults, config)
+    config.method = config.method.toLowerCase()
 
     const chain: PrimoseChain[] = [
       {
