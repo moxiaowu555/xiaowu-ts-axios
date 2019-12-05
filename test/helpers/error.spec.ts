@@ -18,7 +18,7 @@ describe('helpers:error', () => {
     expect(error.message).toBe('Boom!')
     expect(error.config).toBe(config)
     expect(error.code).toBe('SOMETHING')
-    expect(error.requset).toBe(request)
+    expect(error.request).toBe(request)
     expect(error.response).toBe(response)
     expect(error.isAxiosError).toBeTruthy()
   })

@@ -4,14 +4,15 @@ export class AxiosError extends Error {
   isAxiosError: boolean
   config: AxiosRequestConfig
   code?: string | null
-  requset?: any
+  request?: any
   response?: AxiosResponse
 
+  /* istanbul ignore next */
   constructor(
     message: string,
     config: AxiosRequestConfig,
     code?: string | null,
-    requset?: any,
+    request?: any,
     response?: AxiosResponse
   ) {
     super(message)
@@ -19,7 +20,7 @@ export class AxiosError extends Error {
     this.isAxiosError = true
     this.config = config
     this.code = code
-    this.requset = requset
+    this.request = request
     this.response = response
 
     Object.setPrototypeOf(this, AxiosError.prototype)
@@ -30,10 +31,10 @@ export function createError(
   message: string,
   config: AxiosRequestConfig,
   code?: string | null,
-  requset?: any,
+  request?: any,
   response?: AxiosResponse
 ): AxiosError {
-  const error = new AxiosError(message, config, code, requset, response)
+  const error = new AxiosError(message, config, code, request, response)
 
   return error
 }

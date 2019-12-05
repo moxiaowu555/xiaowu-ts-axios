@@ -83,7 +83,7 @@ const urlParsingNode = document.createElement('a')
 const currentOrigin = resolveURL(window.location.href)
 
 function resolveURL(url: string): URLOrigin {
-  urlParsingNode.setAttribute('hef', url)
+  urlParsingNode.setAttribute('href', url)
   const { protocol, host } = urlParsingNode
 
   return {

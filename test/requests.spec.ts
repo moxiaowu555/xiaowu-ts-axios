@@ -10,30 +10,6 @@ describe('requests', () => {
     jasmine.Ajax.uninstall()
   })
 
-  test('should treat single string arg as url', () => {
-    axios('/foo')
-
-    return getAjaxRequest().then(request => {
-      expect(request.url).toBe('/foo')
-      expect(request.method).toBe('GET')
-    })
-  })
-
-  test('should treat method value as lowercase string', () => {
-    axios({
-      url: '/foo',
-      method: 'POST'
-    }).then(response => {
-      expect(response.config.method).toBe('post')
-    })
-
-    return getAjaxRequest().then(request => {
-      request.respondWith({
-        status: 200
-      })
-    })
-  })
-
   test('should reject on network errors', () => {
     const resolveSpy = jest.fn((res: AxiosResponse) => {
       return res
@@ -59,6 +35,52 @@ describe('requests', () => {
 
       jasmine.Ajax.install()
     }
+  })
+
+  test('should treat single string arg as url', () => {
+    axios('/foo')
+
+    return getAjaxRequest().then(request => {
+      expect(request.url).toBe('/foo')
+      expect(request.method).toBe('GET')
+    })
+  })
+
+  test('should treat method value as lowercase string', () => {
+    axios({
+      url: '/foo',
+      method: 'POST'
+    }).then(response => {
+      expect(response.config.method).toBe('post')
+    })
+
+    return getAjaxRequest().then(request => {
+      request.respondWith({
+        status: 200
+      })
+    })
+  })
+
+  test('should reject when request timeout', done => {
+    let err: AxiosError
+
+    axios('/foo', {
+      timeout: 2000,
+      method: 'post'
+    }).catch(error => {
+      err = error
+    })
+
+    getAjaxRequest().then(request => {
+      // @ts-ignore
+      request.eventBus.trigger('timeout')
+
+      setTimeout(() => {
+        expect(err instanceof Error).toBeTruthy()
+        expect(err.message).toBe('Timeout of 2000 ms exceeded')
+        done()
+      }, 100)
+    })
   })
 
   test('should reject when validateStatus return false', done => {
@@ -242,5 +264,37 @@ describe('requests', () => {
     return getAjaxRequest().then(request => {
       expect(request.requestHeaders['Content-Type']).toBe('application/json')
     })
+  })
+
+  test('should support array buffer response', done => {
+    let response: AxiosResponse
+
+    function str2ab(str: string) {
+      const buff = new ArrayBuffer(str.length * 2)
+      const view = new Uint16Array(buff)
+      for (let i = 0; i < str.length; i++) {
+        view[i] = str.charCodeAt(i)
+      }
+      return buff
+    }
+
+    axios('/foo', {
+      responseType: 'arraybuffer'
+    }).then(res => {
+      response = res
+    })
+
+    getAjaxRequest().then(request => {
+      request.respondWith({
+        status: 200,
+        // @ts-ignore
+        response: str2ab('Hello world')
+      })
+    })
+
+    setTimeout(() => {
+      expect(response.data.byteLength).toBe(22)
+      done()
+    }, 100)
   })
 })

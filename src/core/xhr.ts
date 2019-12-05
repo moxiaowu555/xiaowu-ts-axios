@@ -10,8 +10,8 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
     const {
       data = null,
       url,
-      method = 'get',
-      headers,
+      method,
+      headers = {},
       responseType,
       timeout,
       cancelToken,
@@ -26,7 +26,7 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
 
     const request = new XMLHttpRequest()
 
-    request.open(method.toUpperCase(), url!, true)
+    request.open(method!.toUpperCase(), url!, true)
 
     configureRequest()
 
@@ -35,18 +35,18 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
     processHeaders()
 
     processCancel()
-    
+
     request.send(data)
 
     function configureRequest(): void {
       if (responseType) {
         request.responseType = responseType
       }
-  
+
       if (timeout) {
         request.timeout = timeout
       }
-  
+
       if (withCredentials) {
         request.withCredentials = withCredentials
       }
@@ -57,11 +57,11 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
         if (request.readyState !== 4) {
           return
         }
-  
+
         if (request.status === 0) {
           return
         }
-  
+
         const responseHeaders = parseHeaders(request.getAllResponseHeaders())
         const responseData =
           responseType && responseType !== 'text' ? request.response : request.responseText
@@ -75,11 +75,11 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
         }
         handleResponse(response)
       }
-  
+
       request.onerror = function handleError() {
         reject(createError('Network Error', config, null, request))
       }
-  
+
       request.ontimeout = function handleTimeout() {
         reject(createError(`Timeout of ${timeout} ms exceeded`, config, 'ECONNABORTED', request))
       }
@@ -108,7 +108,7 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
       if (auth) {
         headers['Authorization'] = 'Basic ' + btoa(auth.username + ':' + auth.password)
       }
-  
+
       Object.keys(headers).forEach(name => {
         if (data === null && name.toLowerCase() === 'content-type') {
           delete headers[name]
